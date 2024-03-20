@@ -13,12 +13,41 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!item) return;
+
     setAllItems((currentItems) => {
-      return [...currentItems, item];
+      return [...currentItems, {
+        id: Math.floor(Math.random()*100000),
+        title: item,
+        completed: false
+      }];
     });
 
     setItem('');
+    console.log(allItems);
   };
+
+  const handleDelete = (id) => {
+    
+    const updatedItems = allItems.filter((currentItem) => {
+      
+      return currentItem.id !== id;
+    });
+    setAllItems(updatedItems);
+  }
+
+  const handleCheckChange = (id, checked) => {
+    const updatedItems = allItems.map((currentItem) => {
+      if (currentItem.id === id) {
+        return {
+          ...currentItem,
+          completed: checked
+        }
+      }
+      return currentItem;
+    });
+    setAllItems(updatedItems);
+  }
 
   return (
     <>
@@ -29,15 +58,15 @@ function App() {
         <input value={item} onChange={handleInputChange} type="text" />
         <button>Add</button>
       </form>
-      <h3>Todo List</h3>
+      {allItems.length === 0 ? <h3>Empty</h3> : <h3>Todo List ({allItems.length})</h3>}
       <ul>
-        {allItems.map((item, index) => (
-          <li key={index}>
+        {allItems.map((item) => (
+          <li key={item.id}>
             <label>
-              <input type="checkbox" />
-              {item}
+              <input type="checkbox" checked={item.completed} onChange={e => handleCheckChange(item.id, e.target.checked)}/>
+              <span>{item.title}</span>
             </label>
-            <button>Delete</button>
+            <button onClick={e => handleDelete(item.id)}>Delete</button>
           </li>
         ))}
       </ul>
